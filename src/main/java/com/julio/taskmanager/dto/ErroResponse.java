@@ -1,10 +1,12 @@
 package com.julio.taskmanager.dto;
 
+import java.util.List;
+
 public class ErroResponse {
     private int status;
-    private String mensagem;
+    private List<String> mensagem;
 
-    public ErroResponse(int status, String mensagem){
+    public ErroResponse(int status, List<String> mensagem){
         this.status = status;
         this.mensagem = mensagem;
     }
@@ -13,7 +15,7 @@ public class ErroResponse {
         return status;
     }
 
-    public String getMensagem() {
+    public List<String>  getMensagem() {
         return mensagem;
     }
 }

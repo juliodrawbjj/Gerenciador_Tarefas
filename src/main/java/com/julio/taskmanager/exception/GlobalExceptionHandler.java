@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.validation.FieldError;
 
+import java.util.ArrayList;
+import java.util.List;
+
 //"Essa classe vai observar e tratar exceções que acontecem nos meus Controllers."
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -15,27 +18,38 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(TarefaNaoEncontradaException.class)//"Quando acontecer uma TarefaNaoEncontradaException, use este método para tratá-la."
     public ResponseEntity<ErroResponse> tratarTarefaNaoEncontrada(TarefaNaoEncontradaException exception){
 
-        ErroResponse erro = new ErroResponse(
-                404,
-                exception.getMessage()
-        );
+        List<String> mensagens = new ArrayList<>();
+        mensagens.add(exception.getMessage());
+
+        ErroResponse erro = new ErroResponse(404, mensagens);
         return ResponseEntity.status(404).body(erro);
+
+
+
+
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErroResponse> tratarErroDeValidacao(MethodArgumentNotValidException exception) {
 
-            FieldError erro = exception.getBindingResult()
-                .getFieldErrors()
-                .get(0);
+            List<FieldError> erros = exception.getBindingResult()
+                .getFieldErrors();
 
-            String mensagem = erro.getDefaultMessage();
-            String campo = erro.getField();
+            List<String> mensagens = new ArrayList<>();
 
-            String mensagemPersonalizada = "Campo " + campo + " : " + mensagem;
+            for (FieldError erro: erros){
+                String mensagem = erro.getDefaultMessage();
+                String campo = erro.getField();
 
-            ErroResponse erroResponse = new ErroResponse(400, mensagemPersonalizada);
+
+                String mensagemPersonalizada = "Campo " + campo + " : " + mensagem;
+
+                mensagens.add(mensagemPersonalizada);
+            }
+
+            ErroResponse erroResponse = new ErroResponse(400, mensagens);
 
             return ResponseEntity.status(400).body(erroResponse);
+
     }
 }
